@@ -17,6 +17,9 @@ ARG TARGETPLATFORM
 ENV CARGO_INSTALL_ROOT=/xx-cargo/
 RUN --mount=type=cache,target=/var/cache/apt/,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/,sharing=locked \
+    --mount=type=cache,target=/usr/local/cargo/git/db/ \
+    --mount=type=cache,target=/usr/local/cargo/registry/cache/ \
+    --mount=type=cache,target=/usr/local/cargo/registry/index/ \
     <<EOF
     xx-apt install -y --no-install-recommends xx-c-essentials
     xx-cargo binstall --no-confirm cargo-binstall cargo-chef cargo-watch
