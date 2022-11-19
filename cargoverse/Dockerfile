@@ -36,4 +36,4 @@ RUN --mount=type=cache,target=/var/cache/apt/,sharing=locked \
     apt install -y --no-install-recommends clang lld curl
 EOF
 COPY --from=build /xx-cargo/bin/* /usr/local/cargo/bin/
-COPY ./ ./
+COPY ./ /
