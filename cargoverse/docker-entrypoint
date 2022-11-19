@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+for arg in "$@"; do
+    if test "$entrypoint_complete" != true; then
+        if test "$arg" = "--"; then
+            entrypoint_complete=true
+            continue
+        fi
+
+        entrypoint="$entrypoint $arg"
+    else
+        if test -z "$cmd" && { test "${arg#-}" != "$arg" || test -z "$(command -v "$arg")"; }; then
+            cmd="$entrypoint"
+        fi
+
+        cmd="$cmd $arg"
+    fi
+done
+
+exec "$cmd"
