@@ -34,8 +34,7 @@ RUN --mount=type=cache,target=/var/cache/apt/,sharing=locked \
     <<EOF
     apt update
     apt install -y --no-install-recommends clang lld curl
-    rustup component add rustfmt
-    rustup component add clippy
+    rustup component add rustfmt clippy
 EOF
 COPY --from=build /xx-cargo/bin/* /usr/local/cargo/bin/
 COPY ./ /
