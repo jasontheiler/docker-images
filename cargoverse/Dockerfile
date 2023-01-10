@@ -13,8 +13,9 @@ RUN --mount=type=cache,target=/var/cache/apt/,sharing=locked \
     --mount=type=cache,target=/usr/local/cargo/registry/cache/ \
     --mount=type=cache,target=/usr/local/cargo/registry/index/ \
     <<EOF
-    xx-apt update
-    xx-apt install -y --no-install-recommends clang lld xx-c-essentials
+    apt update
+    apt install -y --no-install-recommends clang lld
+    xx-apt install -y --no-install-recommends xx-c-essentials
     xx-cargo install cargo-binstall cargo-chef cargo-watch
 EOF
 
