@@ -27,7 +27,7 @@ RUN --mount=type=cache,target=/var/cache/apt/,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/,sharing=locked \
     <<EOF
     apt update
-    apt install -y --no-install-recommends clang lld pkg-config libssl-dev ca-certificates curl
+    apt install -y --no-install-recommends clang lld pkg-config patch libssl-dev ca-certificates curl
     rustup component add rustfmt clippy
     rustup install nightly
     rustup component add --toolchain nightly rustfmt clippy
