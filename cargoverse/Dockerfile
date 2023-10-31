@@ -16,7 +16,7 @@ RUN --mount=type=cache,target=/var/cache/apt/,sharing=locked \
     apt update
     apt install -y --no-install-recommends clang lld
     xx-apt install -y --no-install-recommends xx-c-essentials
-    xx-cargo install cargo-binstall cargo-chef cargo-watch
+    xx-cargo install cargo-binstall cargo-chef cargo-watch sccache
 EOF
 
 FROM tonistiigi/xx:master AS xx-final
