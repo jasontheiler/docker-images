@@ -28,7 +28,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: "{{defaultContext}}:cargoverse"
-          platforms: linux/amd64 #,linux/arm64,linux/arm/v7
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           provenance: false
           push: true
           tags: jasontheiler/cargoverse:latest
