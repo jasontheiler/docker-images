@@ -1,25 +1,26 @@
 # syntax=docker/dockerfile:1
 # See: https://docs.docker.com/engine/reference/builder/
 
-FROM --platform=$BUILDPLATFORM tonistiigi/xx:master AS xx-build
+FROM --platform=$BUILDPLATFORM tonistiigi/xx AS xx-build
 
 FROM --platform=$BUILDPLATFORM rust:1-slim AS build
 COPY --from=xx-build / /
 ARG TARGETPLATFORM
-ENV PKG_CONFIG_SYSROOT_DIR=/ CARGO_INSTALL_ROOT=/xx-cargo/
 RUN --mount=type=cache,target=/var/cache/apt/,sharing=locked \
     --mount=type=cache,target=/var/lib/apt/,sharing=locked \
-    --mount=type=cache,target=/usr/local/cargo/git/db/ \
-    --mount=type=cache,target=/usr/local/cargo/registry/cache/ \
-    --mount=type=cache,target=/usr/local/cargo/registry/index/ \
     <<EOF
     apt update
-    apt install -y --no-install-recommends clang lld pkg-config libssl-dev
+    apt install -y --no-install-recommends clang lld pkg-config libssl-dev curl
     xx-apt install -y --no-install-recommends xx-c-essentials libssl-dev
-    xx-cargo install cargo-binstall cargo-chef cargo-watch sccache
+    curl -fsSL --proto "=https" --tlsv1.2 https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
 EOF
+ENV PKG_CONFIG_SYSROOT_DIR=/ CARGO_INSTALL_ROOT=/xx-cargo/
+RUN --mount=type=cache,target=/usr/local/cargo/git/db/ \
+    --mount=type=cache,target=/usr/local/cargo/registry/cache/ \
+    --mount=type=cache,target=/usr/local/cargo/registry/index/ \
+    xx-cargo binstall -y cargo-binstall cargo-chef cargo-watch sccache
 
-FROM tonistiigi/xx:master AS xx-final
+FROM tonistiigi/xx AS xx-final
 
 FROM rust:1-slim AS final
 COPY --from=xx-final / /

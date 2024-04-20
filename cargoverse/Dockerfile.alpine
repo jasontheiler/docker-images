@@ -1,0 +1,35 @@
+# syntax=docker/dockerfile:1
+# See: https://docs.docker.com/engine/reference/builder/
+
+FROM --platform=$BUILDPLATFORM tonistiigi/xx AS xx-build
+
+FROM --platform=$BUILDPLATFORM rust:1-alpine AS build
+COPY --from=xx-build / /
+ARG TARGETPLATFORM
+RUN --mount=type=cache,target=/var/cache/apk/,sharing=locked \
+    <<EOF
+    apk update
+    apk add bash musl-dev clang lld pkgconf openssl-dev curl
+    xx-apk add xx-c-essentials openssl-dev
+    curl -fsSL --proto "=https" --tlsv1.2 https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+EOF
+ENV PKG_CONFIG_SYSROOT_DIR=/ CARGO_INSTALL_ROOT=/xx-cargo/
+RUN --mount=type=cache,target=/usr/local/cargo/git/db/ \
+    --mount=type=cache,target=/usr/local/cargo/registry/cache/ \
+    --mount=type=cache,target=/usr/local/cargo/registry/index/ \
+    xx-cargo binstall -y cargo-binstall cargo-chef cargo-watch sccache
+
+FROM tonistiigi/xx AS xx-final
+
+FROM rust:1-alpine AS final
+COPY --from=xx-final / /
+RUN --mount=type=cache,target=/var/cache/apk/,sharing=locked \
+    <<EOF
+    apk update
+    apk add musl-dev clang lld pkgconf patch openssl-dev ca-certificates curl
+    rustup component add rustfmt clippy
+    rustup install nightly
+    rustup component add --toolchain nightly rustfmt clippy
+EOF
+COPY --from=build /xx-cargo/bin/* /usr/local/cargo/bin/
+COPY ./ /
